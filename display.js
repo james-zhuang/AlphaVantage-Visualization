@@ -302,13 +302,16 @@ async function market_cap_chart(comp) {
 };
 
 async function display_all(comp) {
-    await market_cap_chart(comp);
-    await price_sales_chart(comp);
-    await pe_chart(comp);
-    await revenue_chart(comp);
-    await gross_profit_chart(comp);
-    await operating_profit_chart(comp);
-    await earnings_chart(comp);
+    let valid = await alphavantage(comp, 'INCOME_STATEMENT');
+    if (valid) {
+        await market_cap_chart(comp);
+        await price_sales_chart(comp);
+        await pe_chart(comp);
+        await revenue_chart(comp);
+        await gross_profit_chart(comp);
+        await operating_profit_chart(comp);
+        await earnings_chart(comp);
+    }
 }
 
 //Main dashboard handling
@@ -324,6 +327,7 @@ $(function () {
       e.preventDefault();
       var comp = $('#ticker').val();
       if (comp == "") return false;
+
 
       display_all(comp);
 

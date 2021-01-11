@@ -42,7 +42,7 @@ async function alphavantage(company, func, config = '&apikey=') {
     if (cache[company] == null || cache[company][func] == null) {
         let url = `${URL}${func}&symbol=${company}${config}${API_KEY}`;
         let result = await $.getJSON(url, function (data, status) { return data;});
-        
+        console.log(result);
         if (cache[company] == null){
             cache[company] = {};
             cache[company][func] = result;
@@ -77,7 +77,6 @@ async function prices (company) {
 
 async function get_price(company) {
     let parsed = await alphavantage(company, "GLOBAL_QUOTE");
-    while (parsed == null) parsed = await alphavantage(company, "GLOBAL_QUOTE");
     let historical = await prices(company);
     //Reverse so that the oldest dates are first (displayed on the right). May no longer be necessary due to using time axis
     return {name: company, prices: historical.prices.slice().reverse()};
@@ -87,13 +86,7 @@ async function pull_market_cap (company) {
     let prices = await alphavantage(company, "TIME_SERIES_WEEKLY_ADJUSTED", "&outputsize=full&apikey=");
     prices = prices["Weekly Adjusted Time Series"];
 
-    while(prices == null) {
-        prices = await alphavantage(company, "TIME_SERIES_WEEKLY_ADJUSTED", "&outputsize=full&apikey=");
-        prices = prices["Weekly Adjusted Time Series"];
-    }
-
     let shares = await alphavantage(company, "OVERVIEW");
-    while (shares == null) shares = await alphavantage(company, "OVERVIEW");
     shares = shares.MarketCapitalization/prices[Object.keys(prices)[0]]["5. adjusted close"];
 
     let chart_data = {name: company, values: []};
@@ -130,9 +123,6 @@ function calc_change(curr, prev, precision=1) {
 //             annual, annual_change, annual_margin, quarterly, quarterly_change, quarterly_margin}
 async function pullIncomeStatementItem(company, item, margin="totalRevenue") {
     let parsed = await alphavantage(company, "INCOME_STATEMENT");
-    while (parsed.annualReports == null) {
-        parsed = await alphavantage(company, "INCOME_STATEMENT");
-    }
     let annual = {};
     let quarterly = {};
     let chart_data = {name: company, annual: [], annual_change: [], annual_margin: [],
@@ -171,9 +161,6 @@ async function getValuation(company, type) {
     let market_cap = await pull_market_cap(company);
     market_cap = market_cap.display;
     let metric = await pullIncomeStatementItem(company, type);
-    while(metric == null) {
-        metric = await pullIncomeStatementItem(company, type);
-    }
 
     let chart_data = {name: company, values: [], debug: [], metric: metric.quarterly};
     let display = {};
