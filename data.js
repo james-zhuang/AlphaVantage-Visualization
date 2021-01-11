@@ -42,14 +42,12 @@ async function alphavantage(company, func, config = '&apikey=') {
     if (cache[company] == null || cache[company][func] == null) {
         let url = `${URL}${func}&symbol=${company}${config}${API_KEY}`;
         let result = await $.getJSON(url, function (data, status) { return data;});
-        console.log(result);
         if (cache[company] == null){
             cache[company] = {};
             cache[company][func] = result;
         } else {
             cache[company][func] = result;
         }
-
         return result;
 
     } else return cache[company][func];

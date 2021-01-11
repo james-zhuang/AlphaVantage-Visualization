@@ -303,7 +303,7 @@ async function market_cap_chart(comp) {
 
 async function display_all(comp) {
     let valid = await alphavantage(comp, 'INCOME_STATEMENT');
-    if (valid) {
+    if (valid.symbol) {
         await market_cap_chart(comp);
         await price_sales_chart(comp);
         await pe_chart(comp);
