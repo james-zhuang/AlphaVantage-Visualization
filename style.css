@@ -1,0 +1,35 @@
+body { font: 13px Helvetica, Arial; padding-bottom: 5%;}
+h1 { font-size: 4em; text-align: center; }
+#dashboard {
+    position: relative;
+    width: 80vw;
+    margin: 0 auto;
+}
+form input { padding: 10px; width: 80%; margin-left: 10%;}
+.full-width-large {
+  position: relative;
+  margin: auto;
+  height: 60vh;
+  width: 100%;
+}
+.full-width {
+  position: relative;
+  margin: auto;
+  height: 50vh;
+  width: 100%;
+}
+.lineAndBar {
+    position: relative;
+    margin: auto;
+    height: 40vh;
+    width: 100%;
+    display: inline-block;
+}
+
+.line {
+    position: relative;
+    margin: auto;
+    height: 40vh;
+    width: 50%;
+    display: inline-block;
+}
