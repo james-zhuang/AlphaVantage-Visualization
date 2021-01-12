@@ -6,10 +6,11 @@ let cache = {};
 
 
 //Pulls data from AlphaVantage or local cache
-async function alphavantage(company, func, config = '&apikey=') {
+async function alphavantage(company, func, config = '&apikey=', symbol='&symbol=') {
     if (cache[company] == null || cache[company][func] == null) {
-        let url = `${URL}${func}&symbol=${company}${config}${API_KEY}`;
+        let url = `${URL}${func}${symbol}${company}${config}${API_KEY}`;
         let result = await $.getJSON(url, function (data, status) { return data;});
+        console.log(url)
         if (cache[company] == null){
             cache[company] = {};
             cache[company][func] = result;
