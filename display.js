@@ -3,18 +3,33 @@ var charts = {};
 
 // --------- Autcomplete Search ------
 
+function closeAllLists(elmnt) {
+  /*close all autocomplete lists in the document,
+  except the one passed as an argument:*/
+  var x = document.getElementsByClassName("autocomplete-items");
+  for (var i = 0; i < x.length; i++) {
+    if (elmnt != x[i] && elmnt != $('#ticker')[0]) {
+      x[i].parentNode.removeChild(x[i]);
+    }
+  }
+}
+
 function autocomplete(inp) {
 
-  var currentFocus;
+  let currentFocus;
   /*execute a function when someone writes in the text field:*/
   inp.addEventListener("input", async function(e) {
 
       /*close any already open lists of autocompleted values*/
       closeAllLists();
       if (!this.value) { return false;}
+
+
       currentFocus = -1;
       let possible = await alphavantage(this.value, 'SYMBOL_SEARCH', undefined, '&keywords=');
       possible = possible['bestMatches'];
+      console.log(this.value);
+      closeAllLists();
       /*create a DIV element that will contain the items (values):*/
       let a = document.createElement("DIV");
       a.setAttribute("id", this.id + "autocomplete-list");
@@ -24,19 +39,19 @@ function autocomplete(inp) {
       /*for each item in the array...*/
       for (let i = 0; i < possible.length; i++) {
           let symbol = possible[i]['1. symbol'];
+          let type = possible[i]['3. type'];
+          if (symbol.includes('.') || type != 'Equity')
+            continue;
           let name = possible[i]['2. name'];
           let b = document.createElement("DIV");
           /*make the matching letters bold:*/
-          b.innerHTML = "<strong>" + symbol + "</strong>: ";
-          b.innerHTML += name;
+          b.innerHTML = "<strong>" + symbol + "</strong>: " + name;
           /*insert a input field that will hold the current array item's value:*/
           b.innerHTML += "<input type='hidden' value='" + symbol + "'>";
           /*execute a function when someone clicks on the item value (DIV element):*/
           b.addEventListener("click", function(e) {
               /*insert the value for the autocomplete text field:*/
               inp.value = this.getElementsByTagName("input")[0].value;
-              /*close the list of autocompleted values,
-              (or any other open lists of autocompleted values:*/
               closeAllLists();
               $('form').submit();
           });
@@ -60,15 +75,16 @@ function autocomplete(inp) {
         /*and and make the current item more visible:*/
         addActive(x);
       } else if (e.keyCode == 13) {
-        // /*If the ENTER key is pressed, prevent the form from being submitted,*/
-        e.preventDefault();
-        if (currentFocus > -1) {
-          /*and simulate a click on the "active" item:*/
-          if (x) x[currentFocus].click();
-      } else {
-          closeAllLists();
-          $('form').submit();
-      }
+          // /*If the ENTER key is pressed, prevent the form from being submitted,*/
+          e.preventDefault();
+          console.log(currentFocus);
+          if (currentFocus > -1) {
+              /*and simulate a click on the "active" item:*/
+              if (x) x[currentFocus].click();
+          } else {
+              closeAllLists();
+              $('form').submit();
+          }
       }
   });
 
@@ -90,16 +106,6 @@ function autocomplete(inp) {
     }
   }
 
-  function closeAllLists(elmnt) {
-    /*close all autocomplete lists in the document,
-    except the one passed as an argument:*/
-    var x = document.getElementsByClassName("autocomplete-items");
-    for (var i = 0; i < x.length; i++) {
-      if (elmnt != x[i] && elmnt != inp) {
-        x[i].parentNode.removeChild(x[i]);
-      }
-    }
-  }
   /*execute a function when someone clicks in the document:*/
   document.addEventListener("click", function (e) {
       closeAllLists(e.target);
@@ -430,17 +436,20 @@ $(function () {
     var earnings_chart_q;
     Chart.defaults.global.title.fontSize = 16;
 
+    autocomplete($('#ticker')[0]);
+
     $('form').submit(function(e){
       e.preventDefault();
       var comp = $('#ticker').val();
       if (comp == "") return false;
 
-      display_all(comp);
+      display_all(comp.toUpperCase());
       $('#ticker').val('');
+      closeAllLists();
       return false;
     });
 
-    autocomplete($('#ticker')[0]);
+
 
     //  CODE FOR LISTENING TO NODE JS SERVER (THINGPEDIA INTEGRATION)
 
