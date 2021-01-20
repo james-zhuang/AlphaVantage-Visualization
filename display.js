@@ -2,114 +2,84 @@ var colors = {};
 var charts = {};
 
 // --------- Autcomplete Search ------
-
-function closeAllLists(elmnt) {
-  /*close all autocomplete lists in the document,
-  except the one passed as an argument:*/
-  var x = document.getElementsByClassName("autocomplete-items");
-  for (var i = 0; i < x.length; i++) {
-    if (elmnt != x[i] && elmnt != $('#ticker')[0]) {
-      x[i].parentNode.removeChild(x[i]);
-    }
-  }
-}
-
 function autocomplete(inp) {
 
   let currentFocus;
-  /*execute a function when someone writes in the text field:*/
-  inp.addEventListener("input", async function(e) {
 
-      /*close any already open lists of autocompleted values*/
-      closeAllLists();
-      if (!this.value) { return false;}
+  $(inp).on("input", async function(e) {
 
+      $(".autocomplete-items").remove();
+      let search = this.value;
+      if (!search) return false;
 
-      currentFocus = -1;
-      let possible = await alphavantage(this.value, 'SYMBOL_SEARCH', undefined, '&keywords=');
+      let possible = await alphavantage(search, 'SYMBOL_SEARCH', undefined, '&keywords=');
       possible = possible['bestMatches'];
-      console.log(this.value);
-      closeAllLists();
-      /*create a DIV element that will contain the items (values):*/
-      let a = document.createElement("DIV");
-      a.setAttribute("id", this.id + "autocomplete-list");
-      a.setAttribute("class", "autocomplete-items");
-      /*append the DIV element as a child of the autocomplete container:*/
-      this.parentNode.appendChild(a);
-      /*for each item in the array...*/
+      //Check if value has changed -- if it has, this autofill is outdated
+      if (search != this.value) return false;
+      currentFocus = -1;
+
+      let container = $(`<div id="${this.id}-autocomplete-list" class="autocomplete-items"></div>`);
+      $(this).after(container);
+
       for (let i = 0; i < possible.length; i++) {
           let symbol = possible[i]['1. symbol'];
+          let name = possible[i]['2. name'];
+
+          //Filter out irrelevant results
           let type = possible[i]['3. type'];
           if (symbol.includes('.') || type != 'Equity')
             continue;
-          let name = possible[i]['2. name'];
-          let b = document.createElement("DIV");
-          /*make the matching letters bold:*/
-          b.innerHTML = "<strong>" + symbol + "</strong>: " + name;
-          /*insert a input field that will hold the current array item's value:*/
-          b.innerHTML += "<input type='hidden' value='" + symbol + "'>";
-          /*execute a function when someone clicks on the item value (DIV element):*/
-          b.addEventListener("click", function(e) {
-              /*insert the value for the autocomplete text field:*/
-              inp.value = this.getElementsByTagName("input")[0].value;
-              closeAllLists();
+
+          let item = $("<div><strong>" + symbol + "</strong>: " + name+ "</div>");
+          // Submit the ticker if clicked on
+          item.on("click", function(e) {
+              inp.value = symbol;
+              $(".autocomplete-items").remove();
               $('form').submit();
           });
-          a.appendChild(b);
+          container.append(item);
+
       }
+
   });
   /*execute a function presses a key on the keyboard:*/
-  inp.addEventListener("keydown", function(e) {
-      var x = document.getElementById(this.id + "autocomplete-list");
-      if (x) x = x.getElementsByTagName("div");
-      if (e.keyCode == 40) {
-        /*If the arrow DOWN key is pressed,
-        increase the currentFocus variable:*/
-        currentFocus++;
-        /*and and make the current item more visible:*/
-        addActive(x);
-      } else if (e.keyCode == 38) { //up
-        /*If the arrow UP key is pressed,
-        decrease the currentFocus variable:*/
-        currentFocus--;
-        /*and and make the current item more visible:*/
-        addActive(x);
-      } else if (e.keyCode == 13) {
-          // /*If the ENTER key is pressed, prevent the form from being submitted,*/
+  $(inp).on("keydown", function(e) {
+
+      let items = $(`#${this.id + "-autocomplete-list"}`).children();
+
+      if (e.keyCode == 40) {            // Down Arrow Key
           e.preventDefault();
-          console.log(currentFocus);
+          currentFocus++;
+          addActive(items);
+      } else if (e.keyCode == 38) {     // Up Arrow Key
+          e.preventDefault();
+          currentFocus--;
+          addActive(items);
+      } else if (e.keyCode == 13) {     // Enter Key
+          e.preventDefault();
           if (currentFocus > -1) {
-              /*and simulate a click on the "active" item:*/
-              if (x) x[currentFocus].click();
+              if (items) items[currentFocus].click();
           } else {
-              closeAllLists();
+              $(".autocomplete-items").remove();
               $('form').submit();
           }
       }
   });
 
-  function addActive(x) {
-    /*a function to classify an item as "active":*/
-    if (!x) return false;
-    /*start by removing the "active" class on all items:*/
-    removeActive(x);
-    if (currentFocus >= x.length) currentFocus = 0;
-    if (currentFocus < 0) currentFocus = (x.length - 1);
-    /*add class "autocomplete-active":*/
-    x[currentFocus].classList.add("autocomplete-active");
+  function addActive(items) {
+    if (!items) return false;
+    $(".autocomplete-active").removeClass("autocomplete-active");
+
+    if (currentFocus >= items.length) currentFocus = 0;
+    if (currentFocus < 0) currentFocus = (items.length - 1);
+
+    $(items[currentFocus]).addClass("autocomplete-active");
   }
 
-  function removeActive(x) {
-    /*a function to remove the "active" class from all autocomplete items:*/
-    for (var i = 0; i < x.length; i++) {
-      x[i].classList.remove("autocomplete-active");
-    }
-  }
-
-  /*execute a function when someone clicks in the document:*/
-  document.addEventListener("click", function (e) {
-      closeAllLists(e.target);
+  $(document).click(function () {
+      $(".autocomplete-items").remove();
   });
+
 }
 // --------- GRAPHING ---------
 
@@ -445,7 +415,6 @@ $(function () {
 
       display_all(comp.toUpperCase());
       $('#ticker').val('');
-      closeAllLists();
       return false;
     });
 
