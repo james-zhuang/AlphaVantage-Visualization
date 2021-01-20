@@ -6,6 +6,20 @@ h1 { font-size: 4em; text-align: center; }
     margin: 0 auto;
 }
 
+#clear-dashboard {
+    margin: .5em auto 1em auto;
+    font-size: 1em;
+    padding: 0 20px;
+    display: block;
+}
+
+.status-msg {
+    text-align: center;
+    font-size: .85em;
+    visibility: hidden;
+    margin: 0.5em 0;
+}
+
 .autocomplete input {
     width: 100%;
     box-sizing: border-box;
@@ -18,7 +32,7 @@ h1 { font-size: 4em; text-align: center; }
   position: relative;
   width: 70%;
   margin-left: 15%;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .autocomplete-items {
@@ -27,8 +41,6 @@ h1 { font-size: 4em; text-align: center; }
   border-bottom: none;
   border-top: none;
   z-index: 99;
-  /*position the autocomplete items to be the same width as the container:*/
-  top: 100%;
   left: 0;
   right: 0;
 }
@@ -55,18 +67,21 @@ h1 { font-size: 4em; text-align: center; }
   position: relative;
   margin: auto;
   height: 60vh;
+  min-height: 350px;
   width: 100%;
 }
 .full-width {
   position: relative;
   margin: auto;
   height: 50vh;
+  min-height: 350px;
   width: 100%;
 }
 .lineAndBar {
     position: relative;
     margin: auto;
     height: 40vh;
+    min-height: 350px;
     width: 100%;
     display: inline-block;
 }
@@ -75,6 +90,7 @@ h1 { font-size: 4em; text-align: center; }
     position: relative;
     margin: auto;
     height: 40vh;
+    min-height: 350px;
     width: 50%;
     display: inline-block;
 }

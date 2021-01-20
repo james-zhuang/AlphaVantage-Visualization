@@ -384,6 +384,9 @@ async function market_cap_chart(comp) {
 };
 
 async function display_all(comp) {
+
+    $('.status-msg').text('Loading data for '+ comp + '...')
+                    .css('visibility', 'visible');
     let valid = await alphavantage(comp, 'INCOME_STATEMENT');
     if (valid.symbol) {
         await market_cap_chart(comp);
@@ -393,6 +396,9 @@ async function display_all(comp) {
         await gross_profit_chart(comp);
         await operating_profit_chart(comp);
         await earnings_chart(comp);
+        $('.status-msg').text("_").css('visibility', 'hidden');
+    } else {
+
     }
 }
 
@@ -418,7 +424,7 @@ $(function () {
       return false;
     });
 
-
+    $('#clear-dashboard').click(() => {$('#dashboard').empty();});
 
     //  CODE FOR LISTENING TO NODE JS SERVER (THINGPEDIA INTEGRATION)
 

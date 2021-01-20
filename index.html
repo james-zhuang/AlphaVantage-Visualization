@@ -23,9 +23,12 @@
 <body>
     <h1>Stock Charts</h1>
     <form action="">
-        <div class="autocomplete"><input id="ticker" autocomplete="off" placeholder="Search stock symbols..." /></div>
+        <div class="autocomplete">
+            <input id="ticker" autocomplete="off" placeholder="Search stock symbols..." />
+            <p class="status-msg">Ready</p>
+            <button id="clear-dashboard">Clear All </button>
+        </div>
     </form>
-    <ul id="messages"></ul>
     <div id ="dashboard">
     </div>
 </body>
