@@ -22,7 +22,7 @@
 </head>
 <body>
     <h1>Stock Charts</h1>
-    <form action="">
+    <form id="stockSearch" action="">
         <div class="autocomplete">
             <input id="ticker" autocomplete="off" placeholder="Search stock symbols..." />
             <p class="status-msg">Ready</p>
@@ -30,6 +30,15 @@
         </div>
     </form>
     <div id ="dashboard">
+    </div>
+    <div class='wrapper'>
+        <div id="dialogue"></div>
+        <form id="dialogueText">
+            <div class="text-box">
+                <input type="text" name="message" id="message" autocomplete="off" placeholder="Ask our virtual assistant...">
+                <input class="send-button" type="submit" value=">">
+            </div>
+        </form>
     </div>
 </body>
 </html>

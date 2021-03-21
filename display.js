@@ -2,6 +2,7 @@ var colors = {};
 var charts = {};
 
 // --------- Autcomplete Search ------
+
 function autocomplete(inp) {
 
   let currentFocus;
@@ -81,6 +82,7 @@ function autocomplete(inp) {
   });
 
 }
+
 // --------- GRAPHING ---------
 
 function randomColor() {
@@ -329,6 +331,33 @@ function createValuation(type, data, charts, options) {
     }
 }
 
+async function price_chart(comp) {
+    let data = await get_price(comp)
+    if (!$('#price').length) {
+        $('#dashboard').append($('<div class="full-width-large"><canvas id="price"></canvas></div>'));
+        let ctx = document.getElementById('price').getContext('2d');
+        p_chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                datasets: [createPriceDataConfig(data.name, data.prices)]
+            },
+            options: {
+                maintainAspectRatio: false,
+                scales: { xAxes: [{type: 'time', time: { unit: 'week', tooltipFormat: 'll'}}],
+                          yAxes: [{scaleLabel: {display: true, labelString: 'Adjusted Closing Price'}, ticks: {callback:function(value, index, values) {return '$' + value;}}}] },
+                hover: { animationDuration: 0, intersect: false, mode: 'nearest', axis: "x" },
+                tooltips: {intersect: false, mode: 'nearest', axis: "x", //callbacks: {beforeLabel: function(tooltipItem, data) {return '$';}}
+                },
+                title: {text: "Stock Chart",display: true}
+            }
+        });
+  //Add to existing chart as another dataset
+  } else {
+      p_chart.data.datasets.push(createPriceDataConfig(data.name, data.prices));
+      p_chart.update();
+  }
+}
+
 async function earnings_chart(comp) {
     let data = await get_earnings(comp);
     let options = createISLineandBarOptions(['Earnings', 250, -1000]);
@@ -398,9 +427,56 @@ async function display_all(comp) {
         await earnings_chart(comp);
         $('.status-msg').text("_").css('visibility', 'hidden');
     } else {
-
+        $('.status-msg').text("Error: " + comp + " invalid ticker");
     }
 }
+
+// --------- Thingpedia Communication ---------
+function interpretTT(code) {
+    let func = code[7]
+    let comp = code[15]
+    if (func === "price") {
+        price_chart(comp)
+    } else if (func === "market_cap") {
+        market_cap_chart(comp)
+    } else if (func === "ps") {
+        price_sales_chart(comp)
+    } else if (func === "pe") {
+        pe_chart(comp)
+    } else if (func === "revenue") {
+        revenue_chart(comp)
+    } else if (func === "gross_profit") {
+        gross_profit_chart(comp)
+    } else if (func === "operating_profit") {
+        operating_profit_chart(comp)
+    } else if (func === "earnings") {
+        earnings_chart(comp)
+    }
+}
+
+function sendMessage(text) {
+    let urlEndpoint = "https://nlp-staging.almond.stanford.edu/@proj.finassistant/en-US/query?"
+    $.ajax({
+        'url' : urlEndpoint,
+        'type' : 'GET',
+        'data' : {
+            'q' : text
+        },
+        'success' : function(response) {
+            if (response["candidates"][0] && response["candidates"][0]["code"].length == 20) {
+                interpretTT(response["candidates"][0]["code"])
+            } else {
+                console.log(`Error for text: ${text}`)
+                console.log(response)
+            }
+        },
+        'error' : function(request, error)
+        {
+            console.log("Request: "+JSON.stringify(request));
+        }
+    })
+}
+
 
 // Main dashboard handling
 
@@ -417,11 +493,17 @@ $(function () {
     $('form').submit(function(e){
       e.preventDefault();
       var comp = $('#ticker').val();
-      if (comp == "") return false;
-
-      display_all(comp.toUpperCase());
-      $('#ticker').val('');
+      if (comp != "") {
+          display_all(comp.toUpperCase());
+          $('#ticker').val('');
+      }
+      var msg = $('#message').val();
+      if (msg != "") {
+          sendMessage(msg)
+          $('#message').val('');
+      }
       return false;
+
     });
 
     $('#clear-dashboard').click(() => {$('#dashboard').empty();});
