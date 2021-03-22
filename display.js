@@ -432,9 +432,14 @@ async function display_all(comp) {
 }
 
 // --------- Thingpedia Communication ---------
-function interpretTT(code) {
+async function interpretTT(code) {
     let func = code[7]
     let comp = code[15]
+    let url = 'https://almond.stanford.edu/thingpedia/api/v3/entities/lookup/tt:stock_id?q=' + comp
+    let result = await $.getJSON(url)
+    console.log(result)
+    if (result['data'].length > 0)
+        comp = result['data'][0]['value'] || comp
     if (func === "price") {
         price_chart(comp)
     } else if (func === "market_cap") {
