@@ -438,25 +438,39 @@ async function interpretTT(code) {
     let url = 'https://almond.stanford.edu/thingpedia/api/v3/entities/lookup/tt:stock_id?q=' + comp
     let result = await $.getJSON(url)
     console.log(result)
-    if (result['data'].length > 0)
+    if (result['data'].length > 0) {
         comp = result['data'][0]['value'] || comp
-    if (func === "price") {
-        price_chart(comp)
-    } else if (func === "market_cap") {
-        market_cap_chart(comp)
-    } else if (func === "ps") {
-        price_sales_chart(comp)
-    } else if (func === "pe") {
-        pe_chart(comp)
-    } else if (func === "revenue") {
-        revenue_chart(comp)
-    } else if (func === "gross_profit") {
-        gross_profit_chart(comp)
-    } else if (func === "operating_profit") {
-        operating_profit_chart(comp)
-    } else if (func === "earnings") {
-        earnings_chart(comp)
+        comp = comp.toUpperCase()
+        if (func === "price") {
+            dialogueMessage('Displaying the price chart for ' + comp, 'bot')
+            price_chart(comp)
+        } else if (func === "market_cap") {
+            dialogueMessage('Displaying the market cap chart for ' + comp, 'bot')
+            market_cap_chart(comp)
+        } else if (func === "ps") {
+            dialogueMessage('Displaying the P/S chart for ' + comp, 'bot')
+            price_sales_chart(comp)
+        } else if (func === "pe") {
+            dialogueMessage('Displaying the PE chart for ' + comp, 'bot')
+            pe_chart(comp)
+        } else if (func === "revenue") {
+            dialogueMessage('Displaying historical revenue for ' + comp, 'bot')
+            revenue_chart(comp)
+        } else if (func === "gross_profit") {
+            dialogueMessage('Displaying historical gross profit for ' + comp, 'bot')
+            gross_profit_chart(comp)
+        } else if (func === "operating_profit") {
+            dialogueMessage('Displaying historical operating profit for ' + comp, 'bot')
+            operating_profit_chart(comp)
+        } else if (func === "earnings") {
+            dialogueMessage('Displaying historical earnings for ' + comp, 'bot')
+            earnings_chart(comp)
+        }
+    } else {
+        dialogueMessage("Sorry, I didn't understand that. Please try again", "bot")
     }
+
+
 }
 
 function sendMessage(text) {
@@ -471,7 +485,7 @@ function sendMessage(text) {
             if (response["candidates"][0] && response["candidates"][0]["code"].length == 20) {
                 interpretTT(response["candidates"][0]["code"])
             } else {
-                console.log(`Error for text: ${text}`)
+                dialogueMessage("Sorry, I didn't understand that. Please try again", "bot")
                 console.log(response)
             }
         },
@@ -482,6 +496,10 @@ function sendMessage(text) {
     })
 }
 
+function dialogueMessage(text, user) {
+    $('#vpaDialogue').append(`<p class="clearfix"><span class="${user}">${text}</span></p>`)
+    $('#vpaDialogue').scrollTop($('#vpaDialogue')[0].scrollHeight)
+}
 
 // Main dashboard handling
 
@@ -502,10 +520,11 @@ $(function () {
           display_all(comp.toUpperCase());
           $('#ticker').val('');
       }
-      var msg = $('#message').val();
+      var msg = $('#vpaMessage').val();
       if (msg != "") {
           sendMessage(msg)
-          $('#message').val('');
+          $('#vpaMessage').val('')
+          dialogueMessage(msg, 'user')
       }
       return false;
 

@@ -103,7 +103,7 @@ button {
   border-radius: 5px;
 }
 
-.wrapper {
+.vpa-chat-wrapper {
   width: 350px;
   height: 400px;
   box-sizing: border-box;
@@ -117,7 +117,7 @@ button {
   grid-template-rows: 95fr 5fr;
 }
 
-#dialogueText {
+#vpaUserMessage {
   padding: 15px;
   background-color: rgb(56, 56, 56);
 }
@@ -126,7 +126,7 @@ button {
   display: flex;
   width: 100%;
 }
-input#message {
+input#vpaMessage {
   padding-left: 11px;
   padding-right: 9px;
   font-size: 16px;
@@ -153,7 +153,7 @@ input.send-button {
   border-radius: 13px;
 }
 
-div.dialogue {
+div#vpaDialogue {
   overflow-x: none;
   overflow-y: auto;
   display: block;
@@ -176,17 +176,21 @@ div.dialogue {
   padding: 5px 8px;
   margin: 1px;
   border-radius: 12px;
-  display: inline-block;
-  postion: relative;
 }
 .bot {
-  margin-right: 50px;
-  background-color: rgba(255,255,255,.85);
+  background-color: rgb(201, 201, 201);
   border-bottom-left-radius: 0;
+  float: left;
+  margin-right: 50px;
 }
 .user {
-  margin-left: 50px;
   color: white;
-  background-color: #3b3;
+  background-color: #226ad5;
   border-bottom-right-radius: 0;
+  float: right;
+  margin-left: 50px;
+}
+
+.clearfix {
+    overflow: auto;
 }
