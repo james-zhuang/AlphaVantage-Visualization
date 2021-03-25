@@ -418,6 +418,7 @@ async function display_all(comp) {
                     .css('visibility', 'visible');
     let valid = await alphavantage(comp, 'INCOME_STATEMENT');
     if (valid.symbol) {
+        await price_chart(comp)
         await market_cap_chart(comp);
         await price_sales_chart(comp);
         await pe_chart(comp);
